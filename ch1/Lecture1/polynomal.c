@@ -174,7 +174,7 @@ void padd2(int starta, int finisha, int startb, int finishb, int* startd, int* f
 
 	*finishd = avail - 1;
 }
-void attach2(float coefficient, int exponent)  // 다항식 더하기
+void attach2(float coefficient, int exponent)
 {
 	if (avail >= MAX_TERMS) {
 		fprintf(stderr, "다항식에 항이 너무 많다.");
@@ -184,6 +184,7 @@ void attach2(float coefficient, int exponent)  // 다항식 더하기
 	terms[avail].exp = exponent;
 	avail++;
 }
+
 
 void PrintPolynomial2(FILE* f, int start, int finish) {
 	for (int i = start; i <= finish - 1; i++) {
@@ -197,18 +198,29 @@ void PrintPolynomial2(FILE* f, int start, int finish) {
 	}
 
 	int first = 0;
-	for (int i = start; i <= finish; i++) {
-		if (terms[i].coef != 0) {
-			if (first != 0)
-				fprintf(f, " + ");
-			fprintf(f, "%.0fx^%d", terms[i].coef, terms[i].exp);
+	for (int i = start; i <= finish;) {
+		float coef_sum = terms[i].coef;
+		int exp = terms[i].exp;
+		int j = i + 1;
+
+		// 같은 지수를 가진 항들을 합쳐줌
+		while (j <= finish && terms[j].exp == exp) {
+			coef_sum += terms[j].coef;
+			j++;
+		}
+
+		if (coef_sum != 0) {
+			if (first) fprintf(f, " + ");
+			fprintf(f, "%.0fx^%d", coef_sum, exp);
 			first = 1;
 		}
+
+		i = j;
 	}
+
 	if (first == 0) fprintf(f, "0");
 	fprintf(f, "\n");
 }
-
 // **ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 3번 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**
 
 void attach3(float coefficient, int exponent, polyPointer* ptr) {  // 3번째 다항식 더하기
@@ -258,11 +270,10 @@ polyPointer padd(polyPointer a, polyPointer b) {
 
 	rear->link = NULL;
 
-	temp = c;
-	c = c->link;
-	free(temp);
+	polyPointer result = c->link;
+	free(c);  // dummy node만 제거
+	return result;
 
-	return c;
 }
 void SortPolynomial(polyPointer head) {  // exp 기준 내림차순으로 정렬
 	if (head == NULL) return;
@@ -270,6 +281,10 @@ void SortPolynomial(polyPointer head) {  // exp 기준 내림차순으로 정렬
 
 	for (polyPointer i = head; i->link != NULL; i = i->link) {
 		for (polyPointer j = i->link; j != NULL; j = j->link) {
+			if (i->exp == j->exp) {
+				i->coef += j->coef;
+				j->coef = 0;
+			}
 			if (i->exp < j->exp) {
 				float temp_coef = i->coef;
 				int temp_exp = i->exp;
@@ -444,7 +459,6 @@ int main() {
 		printf("파일 열기 실패\n");
 		return 0;
 	}
-
 	start = clock();
 	func1(fin, fout);
 
