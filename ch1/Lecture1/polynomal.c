@@ -1,123 +1,156 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <time.h>
-
-
-typedef struct polyNode* polyPointer;  // 재정의 뭐라뭐라 오류떠서 그냥 맨 위로 올림
-typedef struct polyNode {
-	float coef;
-	int exp;
-	polyPointer link;
-} polyNode;
-
-void attach2(float coefficient, int exponent);
-void attach3(float coef2, int exp2, polyPointer* ptr);
 
 // **ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 1번 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**
 
-#define MAX_DEGREE 101
-
 typedef struct {
-	int degree;
-	float coef[MAX_DEGREE];
+	int degree;      // 최고 차수
+	int capacity;    // coef 배열의 크기
+	float* coef;     // 동적 할당된 계수 배열
 } polynomial;
 
-polynomial Zero() {  // 다항식 하나 0으로 초기화
+
+polynomial Zero(int capacity) {
 	polynomial p;
 	p.degree = 0;
-	for (int i = 0; i < MAX_DEGREE; i++) {
-		p.coef[i] = 0;
-	}
+	p.capacity = capacity;
+	p.coef = (float*)calloc(capacity, sizeof(float)); // 0으로 초기화
 	return p;
 }
 
-bool IsZero(polynomial p) {  // 다항식이 0인지 아닌지 확인
-	for (int i = MAX_DEGREE - 1; i >= 0; i--) {
-		if (p.coef[i] != 0) return false;
+int IsZero(polynomial p) {
+	for (int i = p.capacity - 1; i >= 0; i--) {
+		if (p.coef[i] != 0) return 0;
 	}
-	return true;
+	return 1;
 }
 
-int COMPARE(int a, int b) {  // 걍 비교
+int COMPARE(int a, int b) {  // 비교하는 함수(초기버전의 차수 비교, 개선된 버전의 인덱스 비교에 사용)
 	if (a > b) return 1;
 	else if (a < b) return -1;
 	else return 0;
 }
 
-int Lead_Exp(polynomial p) {  // 맨 뒤에 있는 차수
-	for (int i = MAX_DEGREE - 1; i >= 0; i--) {
+int Lead_Exp(polynomial p) {
+	for (int i = p.capacity - 1; i >= 0; i--) {
 		if (p.coef[i] != 0) return i;
 	}
 	return 0;
 }
 
-float Coef(polynomial p, int a) {  // 지수 반환
+float Coef(polynomial p, int a) {
+	if (a >= p.capacity) return 0;
 	return p.coef[a];
 }
 
-polynomial attach1(polynomial p, float a, int b) {  // 1번째 다항식 함수 더하기
+polynomial Remove(polynomial p, int a) {
+	if (a >= p.capacity) return p;
+
+	p.coef[a] = 0;
+	if (a == p.degree) {
+		for (int i = a - 1; i >= 0; i--) {
+			if (p.coef[i] != 0) {
+				p.degree = i;
+				return p;
+			}
+		}
+		p.degree = 0;
+	}
+	return p;
+}
+
+polynomial attach1(polynomial p, float a, int b) {
+	if (b >= p.capacity) {
+		// 배열 크기 확장
+		int new_capacity = (b + 1) * 2;
+		float* new_coef = (float*)calloc(new_capacity, sizeof(float));
+		for (int i = 0; i < p.capacity; i++) {
+			new_coef[i] = p.coef[i];
+		}
+		free(p.coef);
+		p.coef = new_coef;
+		p.capacity = new_capacity;
+	}
+
 	p.coef[b] += a;
 	if (b > p.degree) p.degree = b;
 	return p;
 }
 
-polynomial Remove(polynomial p, int a) {  // 다항식 지수 하나 없애기
-	p.coef[a] = 0;
-	if (a == p.degree) { // a가 최고 차수라면
-		for (int i = a; i >= 0; i--) {
-			if (p.coef[i] != 0) { // 2번째로 큰 차수가 이제 최고 차수
-				p.degree = i;
-				return p;
-			}
-		}
-	}
-	p.degree = 0; // 여기까지 왔다면 p는 아무것도 남아있지 않음
-	return p;
-}
-
 polynomial Padd(polynomial a, polynomial b) {
-	polynomial d = Zero();
+	// 초기 용량은 두 다항식 중 더 큰 용량으로 설정
+	int init_capacity = (a.capacity > b.capacity ? a.capacity : b.capacity);
+	polynomial d = Zero(init_capacity);
+
 	float sum = 0.0f;
 
-	while (!IsZero(a) && !IsZero(b)) {
-		switch (COMPARE(Lead_Exp(a), Lead_Exp(b))) {
+	while (IsZero(a) != 1 && !IsZero(b) != 1) {
+		int exp_a = Lead_Exp(a);
+		int exp_b = Lead_Exp(b);
+
+		switch (COMPARE(exp_a, exp_b)) {
 		case -1:
-			d = attach1(d, Coef(b, Lead_Exp(b)), Lead_Exp(b));
-			b = Remove(b, Lead_Exp(b));
+			d = attach1(d, Coef(b, exp_b), exp_b);
+			b = Remove(b, exp_b);
 			break;
 		case 0:
-			sum = Coef(a, Lead_Exp(a)) + Coef(b, Lead_Exp(b));
-			if (sum) d = attach1(d, sum, Lead_Exp(a)); // 서로의 합이 0이 아니라면
-			a = Remove(a, Lead_Exp(a));
-			b = Remove(b, Lead_Exp(b));
+			sum = Coef(a, exp_a) + Coef(b, exp_b);
+			if (sum != 0.0f) {
+				d = attach1(d, sum, exp_a);
+			}
+			a = Remove(a, exp_a);
+			b = Remove(b, exp_b);
 			break;
 		case 1:
-			d = attach1(d, Coef(a, Lead_Exp(a)), Lead_Exp(a));
-			a = Remove(a, Lead_Exp(a));
+			d = attach1(d, Coef(a, exp_a), exp_a);
+			a = Remove(a, exp_a);
 			break;
 		}
 	}
 
-	while (!IsZero(a)) {
-		d = attach1(d, Coef(a, Lead_Exp(a)), Lead_Exp(a));
-		a = Remove(a, Lead_Exp(a));
+	// 남은 항 더하기
+	while (IsZero(a) != 1) {
+		int exp = Lead_Exp(a);
+		d = attach1(d, Coef(a, exp), exp);
+		a = Remove(a, exp);
 	}
 
-	while (!IsZero(b)) {
-		d = attach1(d, Coef(b, Lead_Exp(b)), Lead_Exp(b));
-		b = Remove(b, Lead_Exp(b));
+	while (IsZero(b) != 1) {
+		int exp = Lead_Exp(b);
+		d = attach1(d, Coef(b, exp), exp);
+		b = Remove(b, exp);
 	}
 
 	return d;
 }
 
+void FreePolynomial(polynomial* p) {
+	if (p->coef != NULL) {
+		free(p->coef);
+		p->coef = NULL;
+	}
+	p->capacity = 0;
+	p->degree = 0;
+}
+
+polynomial CopyPolynomial(polynomial p) {
+	polynomial copy = Zero(p.capacity);
+	copy.degree = p.degree;
+	for (int i = 0; i < p.capacity; i++) {
+		copy.coef[i] = p.coef[i];
+	}
+	return copy;
+}
+
+
 void PrintPolynomial(FILE* f, polynomial p) {
-	int first = 0; // bool 대신 0과 1로..
-	for (int i = MAX_DEGREE - 1; i >= 0; i--) {
+	int first = 0;
+	for (int i = p.capacity - 1; i >= 0; i--) {
 		if (p.coef[i] != 0) {
-			if (first != 0)
+			if (first != 0) {
 				fprintf(f, " + ");
+			}
 			fprintf(f, "%.0fx^%d", p.coef[i], i);
 			first = 1;
 		}
@@ -125,22 +158,48 @@ void PrintPolynomial(FILE* f, polynomial p) {
 	if (first == 0) fprintf(f, "0");
 	fprintf(f, "\n");
 }
-
 // **ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 2번 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**
-#define MAX_TERMS 100
 
 typedef struct {
 	float coef; // 계수
 	int exp; // 지수
 } polynomial2;
 
-polynomial2 terms[MAX_TERMS]; // 전역 변수 
-int avail = 0;
+polynomial2* terms; // 전역 변수 배열 
+int avail = 0;  // 다음 항이 들어갈 인덱스
+int capacity = 1;
+
+void newTerms(int new_cap) {
+	terms = (polynomial2*)calloc(new_cap, sizeof(polynomial2));
+	if (!terms) {
+		fprintf(stderr, "메모리 할당 실패\n");
+		exit(1);
+	}
+	capacity = new_cap;
+}
+
+void bigger() {
+	int new_capacity = capacity * 2;
+	polynomial2* temp = (polynomial2*)realloc(terms, sizeof(polynomial2) * new_capacity);
+
+	terms = temp;
+	capacity = new_capacity;
+}
+
+void attach2(float coefficient, int exponent)
+{
+	if (avail >= capacity) {
+		bigger();
+	}
+	terms[avail].coef = coefficient;
+	terms[avail].exp = exponent;
+	avail++;
+}
 
 void padd2(int starta, int finisha, int startb, int finishb, int* startd, int* finishd)
 {
 	float sum;
-	*startd = avail;
+	*startd = avail;  // 결과 다항식 시작 인덱스 설정
 
 	while (starta <= finisha && startb <= finishb) {
 		switch (COMPARE(terms[starta].exp, terms[startb].exp)) {
@@ -172,22 +231,13 @@ void padd2(int starta, int finisha, int startb, int finishb, int* startd, int* f
 		startb++;
 	}
 
-	*finishd = avail - 1;
+	*finishd = avail - 1;  // 결과 다항식 끝 인덱스 설정
 }
-void attach2(float coefficient, int exponent)
-{
-	if (avail >= MAX_TERMS) {
-		fprintf(stderr, "다항식에 항이 너무 많다.");
-		exit(1);
-	}
-	terms[avail].coef = coefficient;
-	terms[avail].exp = exponent;
-	avail++;
-}
+
 
 
 void PrintPolynomial2(FILE* f, int start, int finish) {
-	for (int i = start; i <= finish - 1; i++) {
+	for (int i = start; i <= finish - 1; i++) {  // 내림차순으로 정렬
 		for (int j = i + 1; j <= finish; j++) {
 			if (terms[i].exp < terms[j].exp) {
 				polynomial2 temp = terms[i];
@@ -203,7 +253,8 @@ void PrintPolynomial2(FILE* f, int start, int finish) {
 		int exp = terms[i].exp;
 		int j = i + 1;
 
-		// 같은 지수를 가진 항들을 합쳐줌
+		// 혹시라도 합이 안될 수도 있으니 한 번더 체크한다 
+
 		while (j <= finish && terms[j].exp == exp) {
 			coef_sum += terms[j].coef;
 			j++;
@@ -223,23 +274,30 @@ void PrintPolynomial2(FILE* f, int start, int finish) {
 }
 // **ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 3번 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**
 
+typedef struct polyNode* polyPointer;
+typedef struct polyNode {
+	float coef;
+	int exp;
+	polyPointer link;
+} polyNode;
+
 void attach3(float coefficient, int exponent, polyPointer* ptr) {  // 3번째 다항식 더하기
 	polyPointer temp;
-	temp = (polyPointer)malloc(sizeof(struct polyNode));
+	temp = (polyPointer)malloc(sizeof(struct polyNode));  // 동적 배열
 	temp->coef = coefficient;
 	temp->exp = exponent;
 	temp->link = NULL;
-	(*ptr)->link = temp;
-	*ptr = temp;
+	(*ptr)->link = temp;  // 현재 노드 뒤에 연결
+	*ptr = temp;  // 현재 포인터를 새 노드로 바꾼다
 }
 
 polyPointer padd(polyPointer a, polyPointer b) {
-	polyPointer c, rear, temp;
+	polyPointer s, rear, temp;
 	int sum;
 
 	rear = (polyPointer)malloc(sizeof(struct polyNode));
 	rear->link = NULL;
-	c = rear;
+	s = rear;
 
 	while (a && b) {
 		switch (COMPARE(a->exp, b->exp)) {
@@ -270,11 +328,21 @@ polyPointer padd(polyPointer a, polyPointer b) {
 
 	rear->link = NULL;
 
-	polyPointer result = c->link;
-	free(c);  // dummy node만 제거
+	polyPointer result = s->link;
+	free(s);  // dummy node만 제거
 	return result;
 
 }
+
+void freeList(polyPointer head) { // 동적할당한거 없애주기 free()
+	polyPointer temp;
+	while (head != NULL) {
+		temp = head;
+		head = head->link;
+		free(temp);
+	}
+}
+
 void SortPolynomial(polyPointer head) {  // exp 기준 내림차순으로 정렬
 	if (head == NULL) return;
 	int count = 0;  // 무한 루프 방지용
@@ -285,7 +353,7 @@ void SortPolynomial(polyPointer head) {  // exp 기준 내림차순으로 정렬
 				i->coef += j->coef;
 				j->coef = 0;
 			}
-			if (i->exp < j->exp) {
+			if (i->exp < j->exp) {   // 정렬
 				float temp_coef = i->coef;
 				int temp_exp = i->exp;
 
@@ -320,12 +388,15 @@ void PrintPolynomial3(FILE* f, polyPointer p) {
 
 
 void func1(FILE* fin, FILE* fout) {
-
 	int x1, x2;
 	fscanf(fin, "%d%d", &x1, &x2);
 
-	polynomial a = Zero();
-	polynomial b = Zero();
+	// 적절한 초기 용량 설정 (최소 1 이상)
+	int cap1 = x1 > 0 ? x1 * 2 : 4;
+	int cap2 = x2 > 0 ? x2 * 2 : 4;
+
+	polynomial a = Zero(cap1);
+	polynomial b = Zero(cap2);
 
 	for (int i = 0; i < x1; i++) {
 		float coef;
@@ -335,17 +406,27 @@ void func1(FILE* fin, FILE* fout) {
 	}
 
 	for (int i = 0; i < x2; i++) {
-		float coef; int exp;
+		float coef;
+		int exp;
 		fscanf(fin, "%f%d", &coef, &exp);
 		b = attach1(b, coef, exp);
 	}
 
-	polynomial result1 = Padd(a, b);
+	polynomial a_copy = CopyPolynomial(a);
+	polynomial b_copy = CopyPolynomial(b);
+	polynomial result1 = Padd(CopyPolynomial(a), CopyPolynomial(b));
 
+	// 출력
 	PrintPolynomial(fout, a);
 	PrintPolynomial(fout, b);
 	PrintPolynomial(fout, result1);
 
+	// 메모리 해제
+	FreePolynomial(&a);
+	FreePolynomial(&b);
+	FreePolynomial(&a_copy);
+	FreePolynomial(&b_copy);
+	FreePolynomial(&result1);
 }
 
 void func2(FILE* fin, FILE* fout) {
@@ -353,11 +434,12 @@ void func2(FILE* fin, FILE* fout) {
 	int x1, x2;
 	fscanf(fin, "%d%d", &x1, &x2);
 
+	newTerms(capacity);
 	avail = 0; // 전역 배열 초기화
+
 	int starta = avail;
 
-	// 다항식 A 입력
-	for (int i = 0; i < x1; i++) {
+	for (int i = 0; i < x1; i++) {   // 다항식 a 입력
 		float coef;
 		int exp;
 		fscanf(fin, "%f%d", &coef, &exp);
@@ -365,9 +447,8 @@ void func2(FILE* fin, FILE* fout) {
 	}
 	int finisha = avail - 1;
 
-	// 다항식 B 입력
 	int startb = avail;
-	for (int i = 0; i < x2; i++) {
+	for (int i = 0; i < x2; i++) {    // 다항식 b 입력
 		float coef;
 		int exp;
 		fscanf(fin, "%f%d", &coef, &exp);
@@ -383,6 +464,8 @@ void func2(FILE* fin, FILE* fout) {
 	PrintPolynomial2(fout, startb, finishb);
 	PrintPolynomial2(fout, startd, finishd);
 
+	free(terms);
+
 	return;
 }
 
@@ -390,8 +473,7 @@ void func3(FILE* fin, FILE* fout) {
 	int x1, x2;
 	fscanf(fin, "%d%d", &x1, &x2); // 각 다항식의 항 개수
 
-	// A 다항식 입력
-	polyPointer a = NULL, a_tail = NULL;
+	polyPointer a = NULL, a_tail = NULL;  // 다항식 a 입력
 	for (int i = 0; i < x1; i++) {
 		float coef;
 		int exp;
@@ -410,8 +492,7 @@ void func3(FILE* fin, FILE* fout) {
 		}
 	}
 
-	// B 다항식 입력
-	polyPointer b = NULL, b_tail = NULL;
+	polyPointer b = NULL, b_tail = NULL;  // 다항식 b 입력 
 	for (int i = 0; i < x2; i++) {
 		float coef;
 		int exp;
@@ -435,11 +516,16 @@ void func3(FILE* fin, FILE* fout) {
 	SortPolynomial(a);
 	SortPolynomial(b);
 	SortPolynomial(c);
+
 	// 출력
 
 	PrintPolynomial3(fout, a);
 	PrintPolynomial3(fout, b);
 	PrintPolynomial3(fout, c);
+
+	freeList(a);
+	freeList(b);
+	freeList(c);
 
 	return;
 }
@@ -459,28 +545,27 @@ int main() {
 		printf("파일 열기 실패\n");
 		return 0;
 	}
+
 	start = clock();
 	func1(fin, fout);
-
 	end = clock();
-	s1 = ((double)(end - start) * 1000) / CLOCKS_PER_SEC;
+	s1 = ((double)(end - start) * 1000.0) / CLOCKS_PER_SEC;
 
 	rewind(fin);  // 읽는 포인터 위치 초기화
 
 	start = clock();
 	func2(fin, fout);
-
 	end = clock();
-	s2 = ((double)(end - start) * 1000) / CLOCKS_PER_SEC;
+	s2 = ((double)(end - start) * 1000.0) / CLOCKS_PER_SEC;
 
 	rewind(fin);
 
 	start = clock();
 	func3(fin, fout);
 	end = clock();
-	s3 = ((double)(end - start) * 1000) / CLOCKS_PER_SEC;
+	s3 = ((double)(end - start) * 1000.0) / CLOCKS_PER_SEC;
 
-	fprintf(fout, "%lf\t%lf\t%lf", s1, s2, s3);  // 첫번째 함수, 두번째 함수, 세번째 함수의 실행 시간
+	fprintf(fout, "%.4lf\t%.4lf\t%.4lf\n", s1, s2, s3);
 
 	fclose(fin);
 	fclose(fout);
