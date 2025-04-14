@@ -137,15 +137,30 @@ void FreePolynomial(polynomial* p) {
     p->degree = 0;
 }
 
-void PrintPolynomial(FILE* fout, polynomial p) {
-    for (int i = p.capacity - 1; i >= 0; i--) {
-        if (p.coef[i] != 0) {
-            fprintf(fout, "%.1fx^%d ", p.coef[i], i);
-        }
+polynomial CopyPolynomial(polynomial p) {
+    polynomial copy = Zero(p.capacity);
+    copy.degree = p.degree;
+    for (int i = 0; i < p.capacity; i++) {
+        copy.coef[i] = p.coef[i];
     }
-    fprintf(fout, "\n");
+    return copy;
 }
 
+
+void PrintPolynomial(FILE* f, polynomial p) {
+    int first = 0;
+    for (int i = p.capacity - 1; i >= 0; i--) {
+        if (p.coef[i] != 0) {
+            if (first!=0) {
+                fprintf(f, " + ");
+            }
+            fprintf(f, "%.0fx^%d", p.coef[i], i);
+            first = 1;
+        }
+    }
+    if (first == 0) fprintf(f, "0");
+	fprintf(f, "\n");
+}
 
 // **ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 2번 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**
 #define MAX_TERMS 100
@@ -372,16 +387,21 @@ void func1(FILE* fin, FILE* fout) {
         b = attach1(b, coef, exp);
     }
 
-    polynomial result1 = Padd(a, b);
+    polynomial a_copy = CopyPolynomial(a);
+    polynomial b_copy = CopyPolynomial(b);
+    polynomial result1 = Padd(CopyPolynomial(a), CopyPolynomial(b));
 
+    // 출력
     PrintPolynomial(fout, a);
     PrintPolynomial(fout, b);
     PrintPolynomial(fout, result1);
-
-    // 동적 메모리 해제
+    
+    // 메모리 해제
     FreePolynomial(&a);
     FreePolynomial(&b);
-    FreePolynomial(&result1);
+    FreePolynomial(&a_copy);
+    FreePolynomial(&b_copy);
+    FreePolynomial(&result1);    
 }
 
 void func2(FILE* fin, FILE* fout) {
