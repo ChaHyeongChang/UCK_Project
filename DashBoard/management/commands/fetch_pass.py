@@ -17,7 +17,7 @@ class Command(BaseCommand):
         def clean_name(name):
             return re.sub(r'\s*\(.*?\)', '', name).strip()
 
-        # 1. 페이징 루프
+        # 1. 법안 데이터 수집
         while True:
             print(f"📄 현재 {page}페이지 요청 중...")
             params = {
@@ -28,11 +28,9 @@ class Command(BaseCommand):
                 'AGE': '22',
             }
             resp = requests.get(base_url, params=params, timeout=20)
-            print(f"응답 코드: {resp.status_code}, 데이터 길이: {len(resp.text)}")
-
-            result    = resp.json()
+            result = resp.json()
             data_list = result.get(API_ID, [])
-            data      = None
+            data = None
             for sec in data_list:
                 if 'row' in sec:
                     data = sec['row']
@@ -42,17 +40,11 @@ class Command(BaseCommand):
                 print("🚫 더 이상 데이터 없음, 수집 종료")
                 break
 
-            print(f"📦 가져온 데이터 수: {len(data)}")
-
-            # 2. 한 페이지 내 각 법안 처리
             for item in data:
-                # ──── 결과 문자열 확보
                 result_str = str(item.get('PROC_RESULT') or '').strip()
-                # 심의 전(null) 법안은 건수에도 포함하지 않음
                 if not result_str:
                     continue
 
-                # ──── 발의자 이름 추출
                 main = item.get('RST_PROPOSER', '')
                 co   = item.get('PUBL_PROPOSER', '')
                 names = set()
@@ -62,7 +54,6 @@ class Command(BaseCommand):
                     for nm in co.split(','):
                         names.add(clean_name(nm))
 
-                # ──── 통계 집계
                 for nm in names:
                     if not nm:
                         continue
@@ -75,7 +66,9 @@ class Command(BaseCommand):
             print(f"✅ {page}페이지 처리 완료")
             page += 1
 
-        # 3. DB에 저장
+        # 2. 의원 정보에 반영 (성능 개선)
+        to_update = []
+
         for member in MemberInfo.objects.all():
             key = clean_name(member.name)
             stat = proposer_stats.get(key)
@@ -86,9 +79,12 @@ class Command(BaseCommand):
                 member.total_bills  = total
                 member.passed_bills = passed
                 member.pass_rate    = rate
-                member.save()
-                print(f"🟢 {member.name}: {total}건 → {passed}건 → 가결률 {rate}%")
+                to_update.append(member)
+                print(f"🟢 {member.name}: {total}건 → {passed}건 → {rate}%")
             else:
                 print(f"⚪ {member.name}: 처리된 법안 없음")
+
+        # 3. DB에 일괄 저장
+        MemberInfo.objects.bulk_update(to_update, ['total_bills', 'passed_bills', 'pass_rate'])
 
         self.stdout.write(self.style.SUCCESS("국회의원별 가결률 계산 완료"))

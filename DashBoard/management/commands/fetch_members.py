@@ -1,8 +1,8 @@
-from DashBoard.models import MemberInfo
+from DashBoard.models import MemberInfo as Member
 from django.core.management.base import BaseCommand
 import requests
 
-class Member(BaseCommand):
+class Command(BaseCommand):
     help = '국회의원 인적사항 API에서 데이터를 가져와 저장합니다.'
 
     def handle(self, *args, **kwargs):
@@ -42,30 +42,33 @@ class Member(BaseCommand):
             if not data:
                 break
 
+            members_to_create = []
+
             for item in data:
-                if not item.get('HG_NM'):
+                if not item.get('HG_NM') or not item.get('MONA_CD'):
                     continue
 
-                Member.objects.update_or_create(
+                member = Member(
                     member_code=item.get('MONA_CD'),
-                    defaults={
-                        'name': item.get('HG_NM'),
-                        'hanja_name': item.get('HJ_NM') or '',
-                        'birth_date': item.get('BTH_DATE'),
-                        'party': item.get('POLY_NM'),
-                        'district': item.get('ORIG_NM'),
-                        'elected_type': item.get('ELECT_GBN_NM'),
-                        'reelection': item.get('REELE_GBN_NM'),
-                        'gender': item.get('SEX_GBN_NM'),
-                        'election_unit': item.get('UNITS'),
-                        'phone': item.get('TEL_NO'),
-                        'email': item.get('E_MAIL') or '',
-                        'position': item.get('JOB_RES_NM'),
-                        'main_committee': item.get('CMIT_NM') or '',
-
-                    }
+                    name=item.get('HG_NM'),
+                    hanja_name=item.get('HJ_NM') or '',
+                    birth_date=item.get('BTH_DATE'),
+                    party=item.get('POLY_NM') or '',
+                    district=item.get('ORIG_NM') or '',
+                    elected_type=item.get('ELECT_GBN_NM') or '',
+                    reelection=item.get('REELE_GBN_NM') or '',
+                    gender=item.get('SEX_GBN_NM') or '',
+                    election_unit=item.get('UNITS') or '',
+                    phone=item.get('TEL_NO') or '',
+                    email=item.get('E_MAIL') or '',
+                    position=item.get('JOB_RES_NM') or '',
+                    main_committee=item.get('CMIT_NM') or '',
                 )
-                total_saved += 1
+
+                members_to_create.append(member)
+
+            Member.objects.bulk_create(members_to_create, ignore_conflicts=True)
+            total_saved += len(members_to_create)
 
             print(f'{page}페이지 완료 - 누적 {total_saved}명 저장')
             page += 1
