@@ -9,18 +9,36 @@ def about_view(request):
     return render(request, 'about.html')
 
 def rate_view(request):
-    members = MemberInfo.objects.filter(elected_type='비례대표').order_by('name')
-    paginator = Paginator(members, 15)  # 한 페이지에 15명씩
+    query = request.GET.get('q', '')
+    if query:
+        members = MemberInfo.objects.filter(
+            elected_type='비례대표',
+            name__icontains=query
+        ).order_by('name')
+    else:
+        members = MemberInfo.objects.filter(
+            elected_type='비례대표'
+        ).order_by('name')
+    paginator = Paginator(members, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'rate.html', {'page_obj': page_obj})
+    return render(request, 'rate.html', {'page_obj': page_obj, 'query': query})
 
 def local_view(request):
-    members = MemberInfo.objects.filter(elected_type='지역구').order_by('name')
-    paginator = Paginator(members, 15)  # 한 페이지에 15명씩
+    query = request.GET.get('q', '')
+    if query:
+        members = MemberInfo.objects.filter(
+            elected_type='지역구',
+            name__icontains=query
+        ).order_by('name')
+    else:
+        members = MemberInfo.objects.filter(
+            elected_type='지역구'
+        ).order_by('name')
+    paginator = Paginator(members, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'local.html', {'page_obj': page_obj})
+    return render(request, 'local.html', {'page_obj': page_obj, 'query': query})
 
 def map_view(request):
     return render(request, 'map.html')
