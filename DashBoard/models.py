@@ -18,6 +18,8 @@ class MemberInfo(models.Model):
     total_bills  = models.PositiveIntegerField(default=0)
     passed_bills = models.PositiveIntegerField(default=0)
     pass_rate    = models.FloatField(default=0.0)
+    pass_rate = models.FloatField(default=0.0)
+    attendance_rate = models.FloatField(null=True, blank=True)  # 출석률 추가
     
     def __str__(self):
         return self.name

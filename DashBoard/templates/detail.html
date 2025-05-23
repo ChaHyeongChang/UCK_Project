@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <title>국회의원 정보 마당</title>
@@ -9,12 +10,14 @@
       text-decoration: none;
       color: inherit;
     }
+
     body {
       margin: 0;
       font-family: '맑은 고딕', sans-serif;
       background-color: #2f2f2f;
       color: white;
     }
+
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -25,48 +28,26 @@
       gap: 30px;
       font-weight: bold;
     }
+
     .logo {
       color: #00ff66;
       font-size: 40px;
       font-weight: bold;
     }
+
     .menu {
       display: flex;
       gap: 30px;
       font-size: 20px;
       position: relative;
     }
-    .menu div {
-      color: white;
-      cursor: pointer;
-    }
-    .dropdown {
-      position: relative;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background-color: #3a3a3a;
-      min-width: 160px;
-      border-radius: 5px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      z-index: 1;
-    }
-    .dropdown-content a {
-      display: block;
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      font-size: 18px;
-    }
-    .dropdown-content a:hover {
-      background-color: #555;
-    }
+
     .dropdown:hover .dropdown-content {
       display: block;
     }
+
+    /* … 생략: .dropdown-content 스타일 … */
+
     .top-title {
       text-align: center;
       font-size: 40px;
@@ -74,177 +55,225 @@
       padding-top: 30px;
       margin-bottom: 20px;
     }
+
     .top-title span {
       font-size: 50px;
     }
+
     .card {
       display: flex;
       background-color: #3a3a3a;
-      padding: 40px;
+      margin-top: 30px;
       border-radius: 20px;
       max-width: 1500px;
       margin: 0 auto;
-      gap: 40px;
+      gap: 30px;
+      padding: 40px 40px 270px 40px;
     }
-     .card-left {
-    width: 300px;
-    text-align: center;
-    overflow: visible;
-    margin-top: -30px;
-  }
+
+    /* 왼쪽: 사진 */
+    .card-left {
+      width: 300px;
+      text-align: center;
+      margin-top: -30px;
+      font-size: 40px;
+      font-weight: bold;
+    }
+
     .member-photo {
-      width: 250px;
+      width: 300px;
       height: 400px;
       object-fit: cover;
       border-radius: 10px;
       margin-top: 30px;
     }
+
+    /* 오른쪽: 두 섹션(인적사항, 활동정보) */
     .card-right {
       display: flex;
-      gap: 100px;
+      gap: 10px;
       flex: 1;
+      margin-top: -50px;
+      margin-left: -250px;
+    }
+
+    .section {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .info-block {
+      display: flex;
+      flex-direction: column;
       word-break: keep-all;
       line-height: 1.6;
-      margin-top: -50px;
     }
-    .info-block h3 {
-      font-size: 40px;
-      margin-bottom: 15px;
-      color: #ccc;
-    }
-    .info-block p {
-      margin: 8px 0;
-      font-size: 25px;
-      word-break: break-word;
-      max-width: 500px;
-      text-indent: -3em;
-      padding-left: 3em;
-    }
-    .info-block strong {
-      font-size: 25px;
-      font-weight: bold;
-    }
-    .long-text {
-      white-space: normal;
+
+    .info-block2 {
+      display: flex;
+      flex-direction: column;
+      word-break: keep-all;
       line-height: 1.6;
     }
-  .gauge {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin: 0 auto;
-  margin-left : 150px;
-  margin-top: 100px;
-}
 
-/* SVG 는 컨테이너 크기에 꽉 차도록 */
-.gauge svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-  overflow: visible;  /* 잘리는 부분 없이 보이게 */
-}
+    .info-block2 p {
+      margin: 8px 0;
+      font-size: 20px;
+      max-width: 550px;
+      margin-left: -250px;
+    }
 
-/* 나머지 스타일은 그대로 유지 */
-.gauge circle.bg {
-  fill: none;
-  stroke: #444;
-  stroke-width: 6;
-}
-.gauge circle.progress {
-  fill: none;
-  stroke: #8b5cf6;
-  stroke-width: 6;
-  stroke-linecap: round;
-  transition: stroke-dasharray 0.6s ease;
-}
-.gauge__label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-.gauge__label .title {
-  display: block;
-  font-size: 30px;
-  color: white;
-}
-.gauge__label .value {
-  display: block;
-  font-size: 45px;
-  font-weight: bold;
-  color: white;
-}
+
+    .info-block2 h3 {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: #ccc;
+      margin-left: -250px;
+    }
+
+
+    .info-block h3 {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .info-block p {
+      margin: 8px 0;
+      font-size: 20px;
+      max-width: 400px;
+    }
+
+    /* 게이지 공통 스타일 */
+    .gauge {
+      position: relative;
+      width: 230px;
+      /* 크기 조정 */
+      height: 230px;
+      top: 500px;
+      margin-left: 150px;
+
+      /* 부모 흐름 안에서 아래 여백만 늘림 */
+
+    }
+
+    .gauge svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+
+    .gauge circle.bg {
+      fill: none;
+      stroke: #444;
+      stroke-width: 6;
+    }
+
+    .gauge circle.progress {
+      fill: none;
+      stroke: #8b5cf6;
+      stroke-width: 6;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.6s ease;
+    }
+
+    .gauge__label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .gauge__label .title {
+      font-size: 22px;
+      color: white;
+    }
+
+    .gauge__label .value {
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* 게이지 위치 조정 */
+    .gauge-left {
+      margin-right: 20px;
+      /* 인적사항/활동정보 왼쪽에 간격 */
+      margin-top: 30px;
+      /* 약간 내려서 텍스트와 어울리도록 */
+    }
   </style>
 </head>
+
 <body>
   <div class="navbar">
     <a href="{% url 'home' %}" class="logo">국회의원 정보 마당</a>
     <div class="menu">
-      <a href="{% url 'about' %}"><div>정보 마당이란</div></a>
-      <div class="dropdown">
-        <div>정보 마당</div>
-        <div class="dropdown-content">
-          <a href="{% url 'local' %}">지역구</a>
-          <a href="{% url 'rate' %}">비례대표</a>
-        </div>
-      </div>
-      <a href="{% url 'read' %}"><div>열람 마당</div></a>
-      <a href="{% url 'social' %}"><div>소통 마당</div></a>
+      <!-- 네비 항목 생략 -->
     </div>
   </div>
 
-  <div class="top-title">
-    <span>{{ member.name }}</span> 국회의원의 정보
-  </div>
 
   <div class="card">
     <div class="card-left">
+        <span>{{ member.name }}</span> 국회의원
       {% if member.MemberImageInfo.image_url %}
-        <img class="member-photo" src="{{ member.MemberImageInfo.image_url }}" alt="{{ member.name }}">
+      <img class="member-photo" src="{{ member.MemberImageInfo.image_url }}" alt="{{ member.name }}">
       {% else %}
-        <div class="member-photo" style="display:flex;align-items:center;justify-content:center;background-color:#555;">
-          사진 없음
-        </div>
+      <div class="member-photo" style="display:flex;align-items:center;justify-content:center;background-color:#555;">
+        사진 없음
+      </div>
       {% endif %}
-
-      <!-- 가결률 그래프 -->
-<div class="gauge">
-  <svg viewBox="0 0 36 36">
-    <!-- 배경 원 (원주 ≈100) -->
-    <circle class="bg" cx="18" cy="18" r="15.9155" />
-    <!-- 진행도 원 -->
-    <circle
-      class="progress"
-      cx="18" cy="18" r="15.9155"
-      stroke-dasharray="{{ member.pass_rate|floatformat:0 }},100" />
-  </svg>
-  <div class="gauge__label">
-    <span class="title">가결률</span>
-    <span class="value">{{ member.pass_rate|floatformat:0 }}%</span>
-  </div>
-</div>
-</div>
+    </div>
 
     <div class="card-right">
-      <div class="info-block">
-        <h3>인적 사항</h3>
-        <p><strong>이름:</strong> {{ member.name }} ({{ member.hanja_name }})</p>
-        <p><strong>성별:</strong> {{ member.gender }}</p>
-        <p><strong>정당명:</strong> {{ member.party }}</p>
-        <p><strong>생년월일:</strong> {{ member.birth_date }}</p>
-        <p><strong>전화번호:</strong> {{ member.phone }}</p>
-        <p><strong>이메일:</strong> {{ member.email }}</p>
+      <!-- 인적 사항 섹션: 왼쪽에 가결률 -->
+      <div class="section">
+        <div class="gauge gauge-left">
+          <svg viewBox="0 0 36 36">
+            <circle class="bg" cx="18" cy="18" r="15.9155" />
+            <circle class="progress" cx="18" cy="18" r="15.9155"
+              stroke-dasharray="{{ member.pass_rate|floatformat:0 }},100" />
+          </svg>
+          <div class="gauge__label">
+            <span class="title">가결률</span>
+            <span class="value">{{ member.pass_rate|floatformat:0 }}%</span>
+          </div>
+        </div>
+        <div class="info-block">
+          <h3>인적 사항</h3>
+          <p><strong>이름:</strong> {{ member.name }} ({{ member.hanja_name }})</p>
+          <p><strong>성별:</strong> {{ member.gender }}</p>
+          <p><strong>정당명:</strong> {{ member.party }}</p>
+          <p><strong>생년월일:</strong> {{ member.birth_date }}</p>
+          <p><strong>전화번호:</strong> {{ member.phone }}</p>
+          <p><strong>이메일:</strong> {{ member.email }}</p>
+        </div>
       </div>
-      <div class="info-block">
-        <h3>활동 정보</h3>
-        <p><strong>선거구 구분:</strong> {{ member.elected_type }}</p>
-        <p><strong>선거구:</strong> {{ member.district }}</p>
-        <p><strong>정당명:</strong> {{ member.party }}</p>
-        <p><strong>대표 위원회:</strong> {{ member.main_committee }}</p>
-        <p><strong>당선 횟수:</strong> {{ member.reelection }}</p>
-        <p><strong>소속 회기:</strong> {{ member.election_unit }}</p>
+
+      <!-- 활동 정보 섹션: 왼쪽에 출석률 -->
+      <div class="section">
+        <div class="gauge gauge-left">
+          <svg viewBox="0 0 36 36">
+            <circle class="bg" cx="18" cy="18" r="15.9155" />
+            <circle class="progress" cx="18" cy="18" r="15.9155"
+              stroke-dasharray="{{ member.attendance_rate|default:0|floatformat:0 }},100" />
+          </svg>
+          <div class="gauge__label">
+            <span class="title">출석률</span>
+            <span class="value">{{ member.attendance_rate|default:0|floatformat:0 }}%</span>
+          </div>
+        </div>
+        <div class="info-block2">
+          <h3>활동 정보</h3>
+          <p><strong>선거구 구분:</strong> {{ member.elected_type }}</p>
+          <p><strong>선거구:</strong> {{ member.district }}</p>
+          <p><strong>대표 위원회:</strong> {{ member.main_committee }}</p>
+          <p><strong>당선 횟수:</strong> {{ member.reelection }}</p>
+          <p><strong>소속 회기:</strong> {{ member.election_unit }}</p>
+        </div>
       </div>
     </div>
   </div>
