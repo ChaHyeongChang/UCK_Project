@@ -1,7 +1,8 @@
 import locale
+from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-from .models import MemberInfo, MemberImageInfo
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import MemberInfo, MemberImageInfo, Post, Comment
 
 def home_view(request):
     return render(request, 'home.html')
@@ -95,3 +96,40 @@ def social_view(request):
 
 def social2_view(request):
     return render(request, 'social2.html')
+
+def social(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        content = request.POST.get('content', '').strip()
+        if title and content:
+            Post.objects.create(title=title, content=content)
+        return redirect(request.path_info)
+
+    query = request.GET.get('q', '')
+    post_list = Post.objects.all().order_by('-created_at')
+    if query:
+        post_list = post_list.filter(title__icontains=query)
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+    return render(request, 'social.html', {
+        'posts': posts,
+        'query': query,
+    })
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.all().order_by('created_at')
+
+    # 댓글 작성
+    if request.method == 'POST':
+        comment_content = request.POST.get('comment', '').strip()
+        if comment_content:
+            Comment.objects.create(post=post, content=comment_content)
+            return redirect(request.path_info)
+    
+    return render(request, 'social2.html', {
+        'post': post,
+        'comments': comments,
+    })
+    

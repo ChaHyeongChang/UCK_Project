@@ -23,5 +23,20 @@ class MemberInfo(models.Model):
         return self.name
     
 class MemberImageInfo(models.Model):
-     member = models.OneToOneField(MemberInfo, on_delete=models.CASCADE, related_name='MemberImageInfo')
-     image_url = models.URLField(max_length=300)
+    member = models.OneToOneField(MemberInfo, on_delete=models.CASCADE, related_name='MemberImageInfo')
+    image_url = models.URLField(max_length=300)
+    
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.CharField(max_length=30, default='사용자')
+
+    def __str__(self):
+        return self.title
+    
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.CharField(max_length=20, default='사용자')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True) 

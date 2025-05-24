@@ -88,5 +88,56 @@
     </div>
   </div>
 
+  <div style="display:flex; gap: 32px; padding: 48px; justify-content:center;">
+  <!-- 게시글 목록 + 검색 -->
+  <div style="background:#222; border-radius:18px; padding:32px; min-width:420px; flex:2;">
+    <div style="font-size: 26px; font-weight: bold; margin-bottom: 14px;">소통 마당</div>
+    <form method="get" style="display:flex; margin-bottom: 18px;">
+      <input type="text" name="q" value="{{ query }}" placeholder="검색어를 입력하세요" 
+            style="flex:1; border-radius:10px 0 0 10px; border:none; padding:8px;">
+      <button type="submit" style="border-radius:0 10px 10px 0; border:none; background:#444; color:#fff; padding:8px 14px;">
+        🔍
+      </button>
+    </form>
+    <ul style="list-style:none; padding:0; margin:0;">
+  {% for post in posts %}
+    <li style="border-bottom:1px solid #444; padding:10px 0;">
+      <b>
+        <a href="{% url 'post_detail' post.id %}" style="color:inherit;">
+          {{ post.title|truncatechars:40 }}
+        </a>
+      </b>
+      <div style="font-size:12px; color:#aaa;">{{ post.created_at|date:"Y-m-d H:i" }}</div>
+    </li>
+  {% empty %}
+    <li style="color:#aaa;">등록된 글이 없습니다.</li>
+  {% endfor %}
+</ul>
+    <!-- 페이징 -->
+    <div style="margin-top:14px;">
+      {% if posts.has_previous %}
+        <a href="?q={{ query }}&page={{ posts.previous_page_number }}" style="color:#00ff66; margin-right:8px;">◀</a>
+      {% endif %}
+      <span style="color:#00ff66;">{{ posts.number }} / {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+        <a href="?q={{ query }}&page={{ posts.next_page_number }}" style="color:#00ff66; margin-left:8px;">▶</a>
+      {% endif %}
+    </div>
+  </div>
+  <!-- 글쓰기 폼 -->
+  <form method="post" style="background:#222; border-radius:18px; padding:32px; min-width:330px; display:flex; flex-direction:column; gap:10px; flex:1;">
+    {% csrf_token %}
+    <div style="font-weight:bold; font-size:18px; text-align:center;">자신의 생각을 자유롭게 입력하세요</div>
+    <input name="title" type="text" maxlength="100" placeholder="제목을 입력하세요" required
+          style="padding:8px; border-radius:10px; border:none; background:#333; color:#fff;">
+    <textarea name="content" placeholder="내용을 입력하세요" required
+              style="min-height:110px; border-radius:10px; border:none; background:#333; color:#fff; padding:8px;"></textarea>
+    <button type="submit" style="padding:10px; border:none; border-radius:10px; background:#00ff66; color:#222; font-weight:bold; cursor:pointer;">
+      등록
+    </button>
+  </form>
+</div>
+
+
 </body>
 </html>

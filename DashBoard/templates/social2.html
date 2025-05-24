@@ -68,6 +68,76 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
+    .detail-container {
+      max-width: 900px;
+      margin: 40px auto 0 auto;
+      background: #232323;
+      border-radius: 20px;
+      padding: 48px 48px 36px 48px;
+    }
+    .detail-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .detail-content-box {
+      background: #c4c4c4;
+      border-radius: 30px;
+      padding: 34px 36px 24px 36px;
+      margin-bottom: 28px;
+      color: #161616;
+      font-size: 20px;
+      line-height: 1.7;
+      font-weight: bold;
+    }
+    .comments-section {
+      margin-bottom: 22px;
+    }
+    .comment {
+      background: #3e3e3e;
+      color: #fff;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      padding: 11px 22px 10px 22px;
+      font-size: 16px;
+    }
+    .comment-author {
+      color: #a0a0a0;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+    .comment-input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .comment-input-row input[type=text] {
+      flex: 1;
+      border-radius: 8px;
+      border: none;
+      padding: 13px;
+      font-size: 16px;
+    }
+    .comment-input-row button {
+      border-radius: 8px;
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 0 25px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .back-link {
+      margin-top: 32px;
+      text-align: right;
+    }
+    .back-link a {
+      color: #fff;
+      font-size: 18px;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -85,6 +155,35 @@
       </div>
       <a href="{% url 'read' %}"><div>열람 마당</div></a>
       <a href="{% url 'social' %}"><div>소통 마당</div></a>
+    </div>
+  </div>
+
+  <div class="detail-container">
+    <div class="detail-title">{{ post.title }}</div>
+    <div class="detail-content-box">
+      {{ post.content|linebreaksbr }}
+    </div>
+
+    <!-- 댓글 리스트 -->
+    <div class="comments-section">
+      {% for comment in comments %}
+        <div class="comment">
+          <div class="comment-author">사용자 {{ forloop.counter }}</div>
+          {{ comment.content|linebreaksbr }}
+        </div>
+      {% empty %}
+        <div style="color:#bbb; margin:10px 0;">아직 댓글이 없습니다.</div>
+      {% endfor %}
+    </div>
+
+    <form method="post" class="comment-input-row" autocomplete="off">
+      {% csrf_token %}
+      <input type="text" name="comment" placeholder="댓글을 입력하세요" required>
+      <button type="submit">등록</button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'social' %}">뒤로가기</a>
     </div>
   </div>
 
