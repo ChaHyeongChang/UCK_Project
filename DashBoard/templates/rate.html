@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>국회의원 정보 마당</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     a {
       text-decoration: none;
       color: inherit;
@@ -11,9 +17,10 @@
 
     body {
       margin: 0;
-      font-family: '맑은 고딕', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       background-color: #2f2f2f;
       color: white;
+      overflow-y: hidden;
     }
 
     .navbar {
@@ -34,11 +41,11 @@
     }
 
     .menu {
-      display: flex;
-      gap: 30px;
-      font-weight: bold;
-      font-size: 20px;
+       display: flex;
+      gap: 70px;
+      font-size: 25px;
       position: relative;
+      margin-top: 10px;
     }
 
     .menu div {
@@ -58,7 +65,7 @@
       background-color: #3a3a3a;
       min-width: 160px;
       border-radius: 5px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       z-index: 1;
     }
 
@@ -84,19 +91,30 @@
       font-size: 45px;
     }
 
-    table {
-      width: 90%;
+    .table-wrapper {
+      max-height: 600px;
+      overflow-y: auto;
       margin: 20px auto;
-      border-collapse: collapse;
+      width: 90%;
       background: #2a2a2a;
+      border-radius: 4px;
+      font-family: '맑은 고딕', sans-serif;
+
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       table-layout: auto;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid #444;
       padding: 10px;
       text-align: center;
       white-space: normal;
+      word-break: break-word;
     }
 
     th {
@@ -104,14 +122,47 @@
       color: #00ff88;
     }
 
-    th:nth-child(1) { min-width: 60px; }
-    th:nth-child(2) { min-width: 140px; }
-    th:nth-child(3) { min-width: 100px; }
-    th:nth-child(4) { min-width: 160px; }
-    th:nth-child(5) { min-width: 120px; }
-    th:nth-child(6) { min-width: 160px; }
-    th:nth-child(7) { min-width: 60px; }
-    th:nth-child(8) { min-width: 100px; }
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 250px;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    th:nth-child(2) {
+      min-width: 140px;
+    }
+
+    th:nth-child(3) {
+      min-width: 70px;
+    }
+
+    th:nth-child(4) {
+      min-width: 110px;
+    }
+
+    th:nth-child(5) {
+      min-width: 120px;
+    }
+
+    th:nth-child(6),
+    td:nth-child(6) {
+      width: 250px;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    th:nth-child(7) {
+      min-width: 60px;
+    }
+
+    th:nth-child(8) {
+      min-width: 100px;
+    }
 
     .clickable-row {
       cursor: pointer;
@@ -123,10 +174,11 @@
 
     .pagination {
       text-align: center;
-      margin: 20px;
+      margin: 20px 0;
     }
 
-    .pagination a, .pagination span {
+    .pagination a,
+    .pagination span {
       color: white;
       margin: 0 5px;
       text-decoration: none;
@@ -150,12 +202,14 @@
     });
   </script>
 </head>
-<body>
 
+<body>
   <div class="navbar">
     <a href="{% url 'home' %}" class="logo">국회의원 정보 마당</a>
     <div class="menu">
-      <a href="{% url 'about' %}"><div>정보 마당이란</div></a>
+      <a href="{% url 'about' %}">
+        <div>정보 마당이란</div>
+      </a>
       <div class="dropdown">
         <div>정보 마당</div>
         <div class="dropdown-content">
@@ -163,55 +217,61 @@
           <a href="{% url 'rate' %}">비례대표</a>
         </div>
       </div>
-      <a href="{% url 'read' %}"><div>열람 마당</div></a>
-      <a href="{% url 'social' %}"><div>소통 마당</div></a>
+      <a href="{% url 'read' %}">
+        <div>열람 마당</div>
+      </a>
+      <a href="{% url 'social' %}">
+        <div>소통 마당</div>
+      </a>
     </div>
   </div>
 
   <h1>정보 마당 <span style="font-size: 60%;">(비례대표)</span></h1>
 
-  <table>
-    <thead>
-      <tr>
-        <th>대수</th>
-        <th>이름(한자명)</th>
-        <th>직책명</th>
-        <th>선거구</th>
-        <th>소속정당</th>
-        <th>대표위원회</th>
-        <th>성별</th>
-        <th>생년월일</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for m in page_obj %}
-      <tr class="clickable-row" data-href="{% url 'member_detail' m.member_code %}">
-        <td>{{ m.election_unit }}</td>
-        <td>{{ m.name }}({{ m.hanja_name }})</td>
-        <td>{{ m.position }}</td>
-        <td>{{ m.district }}</td>
-        <td>{{ m.party }}</td>
-        <td>{{ m.main_committee }}</td>
-        <td>{{ m.gender }}</td>
-        <td>{{ m.birth_date }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>대수</th>
+          <th>이름(한자명)</th>
+          <th>직책명</th>
+          <th>선거구</th>
+          <th>소속정당</th>
+          <th>대표위원회</th>
+          <th>성별</th>
+          <th>생년월일</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in page_obj %}
+        <tr class="clickable-row" data-href="{% url 'member_detail' m.member_code %}">
+          <td>{{ m.election_unit }}</td>
+          <td>{{ m.name }}({{ m.hanja_name }})</td>
+          <td>{{ m.position }}</td>
+          <td>{{ m.district }}</td>
+          <td>{{ m.party }}</td>
+          <td>{{ m.main_committee }}</td>
+          <td>{{ m.gender }}</td>
+          <td>{{ m.birth_date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
   <div class="pagination">
     {% if page_obj.has_previous %}
-      <a href="?page=1">&laquo; 처음</a>
-      <a href="?page={{ page_obj.previous_page_number }}">‹ 이전</a>
+    <a href="?page=1">&laquo; 처음</a>
+    <a href="?page={{ page_obj.previous_page_number }}">‹ 이전</a>
     {% endif %}
 
     <span class="current">페이지 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">다음 ›</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">끝 &raquo;</a>
+    <a href="?page={{ page_obj.next_page_number }}">다음 ›</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">끝 &raquo;</a>
     {% endif %}
   </div>
-
 </body>
+
 </html>

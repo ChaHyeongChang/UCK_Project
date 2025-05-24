@@ -3,6 +3,7 @@
 <html lang="ko">
 
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>국회의원 정보 마당</title>
   <style>
@@ -13,7 +14,7 @@
 
     body {
       margin: 0;
-      font-family: '맑은 고딕', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       background-color: #2f2f2f;
       color: white;
     }
@@ -37,16 +38,43 @@
 
     .menu {
       display: flex;
-      gap: 30px;
-      font-size: 20px;
+      gap: 70px;
+      font-size: 25px;
       position: relative;
+      margin-top: 10px;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #3a3a3a;
+      min-width: 160px;
+      border-radius: 5px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      display: block;
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #555;
     }
 
     .dropdown:hover .dropdown-content {
       display: block;
     }
-
-    /* … 생략: .dropdown-content 스타일 … */
 
     .top-title {
       text-align: center;
@@ -207,18 +235,34 @@
   </style>
 </head>
 
+
 <body>
   <div class="navbar">
     <a href="{% url 'home' %}" class="logo">국회의원 정보 마당</a>
     <div class="menu">
-      <!-- 네비 항목 생략 -->
+      <a href="{% url 'about' %}">
+        <div>정보 마당이란</div>
+      </a>
+      <div class="dropdown">
+        <div>정보 마당</div>
+        <div class="dropdown-content">
+          <a href="{% url 'local' %}">지역구</a>
+          <a href="{% url 'rate' %}">비례대표</a>
+        </div>
+      </div>
+      <a href="{% url 'read' %}">
+        <div>열람 마당</div>
+      </a>
+      <a href="{% url 'social' %}">
+        <div>소통 마당</div>
+      </a>
     </div>
   </div>
 
 
   <div class="card">
     <div class="card-left">
-        <span>{{ member.name }}</span> 국회의원
+      <span>{{ member.name }}</span> 국회의원
       {% if member.MemberImageInfo.image_url %}
       <img class="member-photo" src="{{ member.MemberImageInfo.image_url }}" alt="{{ member.name }}">
       {% else %}
@@ -278,4 +322,5 @@
     </div>
   </div>
 </body>
+
 </html>

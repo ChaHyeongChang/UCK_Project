@@ -10,14 +10,14 @@ def about_view(request):
 
 def rate_view(request):
     members = MemberInfo.objects.filter(elected_type='비례대표').order_by('name')
-    paginator = Paginator(members, 15)  # 한 페이지에 15명씩
+    paginator = Paginator(members, 13)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'rate.html', {'page_obj': page_obj})
 
 def local_view(request):
     members = MemberInfo.objects.filter(elected_type='지역구').order_by('name')
-    paginator = Paginator(members, 15)  # 한 페이지에 15명씩
+    paginator = Paginator(members, 13) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'local.html', {'page_obj': page_obj})

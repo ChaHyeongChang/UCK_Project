@@ -1,7 +1,9 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>국회의원 정보 마당</title>
   <style>
@@ -9,27 +11,33 @@
       text-decoration: none;
       color: inherit;
     }
+
     body {
       margin: 0;
-      font-family: '맑은 고딕', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       background-color: #2f2f2f;
       color: white;
+      overflow-y: hidden;
     }
+
     .container {
       display: flex;
     }
+
     .left {
       width: 50%;
       padding: 40px;
     }
+
     .right {
       width: 50%;
       background-color: #bca8f2;
       padding: 40px;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: bold;
       color: black;
     }
+
     .box {
       background-color: #fdf6e3;
       padding: 20px;
@@ -37,6 +45,7 @@
       margin-bottom: 40px;
       border-radius: 10px;
     }
+
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -47,24 +56,30 @@
       gap: 30px;
       font-weight: bold;
     }
+
     .logo {
       color: #00ff66;
       font-size: 40px;
       font-weight: bold;
     }
+
     .menu {
       display: flex;
-      gap: 30px;
-      font-size: 20px;
+      gap: 70px;
+      font-size: 25px;
       position: relative;
+      margin-top: 10px;
     }
+
     .menu div {
       color: white;
       cursor: pointer;
     }
+
     .dropdown {
       position: relative;
     }
+
     .dropdown-content {
       display: none;
       position: absolute;
@@ -73,9 +88,10 @@
       background-color: #3a3a3a;
       min-width: 160px;
       border-radius: 5px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       z-index: 1;
     }
+
     .dropdown-content a {
       display: block;
       color: white;
@@ -83,19 +99,24 @@
       text-decoration: none;
       font-size: 18px;
     }
+
     .dropdown-content a:hover {
       background-color: #555;
     }
+
     .dropdown:hover .dropdown-content {
       display: block;
     }
   </style>
 </head>
+
 <body>
   <div class="navbar">
     <a href="{% url 'home' %}" class="logo">국회의원 정보 마당</a>
     <div class="menu">
-      <a href="{% url 'about' %}"><div>정보 마당이란</div></a>
+      <a href="{% url 'about' %}">
+        <div>정보 마당이란</div>
+      </a>
       <div class="dropdown">
         <div>정보 마당</div>
         <div class="dropdown-content">
@@ -103,47 +124,61 @@
           <a href="{% url 'rate' %}">비례대표</a>
         </div>
       </div>
-      <a href="{% url 'read' %}"><div>열람 마당</div></a>
-      <a href="{% url 'social' %}"><div>소통 마당</div></a>
+      <a href="{% url 'read' %}">
+        <div>열람 마당</div>
+      </a>
+      <a href="{% url 'social' %}">
+        <div>소통 마당</div>
+      </a>
     </div>
   </div>
 
   <div class="container">
     <div class="left">
-      <h1 style="color: #00ff66; font-size: 80px; margin-top: -20px; margin-left: 50px">국회 의원<br>&nbsp;&nbsp;&nbsp;정보 마당</h1>
-      <img src="{% static 'DashBoard/img/HomeImage.png' %}" style="margin: 30px; width: 80%;" alt="의원 이미지">
+      <h1 style="color: #00ff66; font-size: 75px; margin-top: -25px; margin-left: 50px">국회 의원<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;정보 마당
+      </h1>
+      <img src="{% static 'DashBoard/img/HomeImage.png' %}" style="margin-top:-40px ;margin-left: 100px; width: 70%;"
+        alt="의원 이미지">
     </div>
 
     <div class="right">
-      <p><strong style="font-size: 30px">정보 마당에서 제공하는<br> 데이터를 바로 확인해보세요.</strong></p>
-
+      <p style="margin-top: -10px;">
+        <strong style="font-size: 30px;">정보 마당에서 제공하는<br> 데이터를 바로 확인해보세요.</strong>
+      </p>
       <a href="{% url 'local' %}">
         <div class="box">
-          <strong style="font-size: 25px;">지역구 국회의원</strong><br><br>
+          <strong style="font-size: 25px;">지역구 국회의원</strong><br>
+          <div style="margin-top: 10px;">
           → 국회의원의 기본정보, 활동정보, 참석률, 법안 가결률을 확인할 수 있습니다.
         </div>
-      </a>
+    </div>
+    </a>
 
-      <a href="{% url 'rate' %}">
-        <div class="box">
-          <strong style="font-size: 25px;">비례대표 국회의원</strong><br><br>
+    <a href="{% url 'rate' %}">
+      <div class="box">
+        <strong style="font-size: 25px;">비례대표 국회의원</strong><br>
+        <div style="margin-top: 10px;">
           → 비례대표 국회의원의 기본정보, 활동정보, 참석률, 법안 가결률을 확인할 수 있습니다.
         </div>
-      </a>
+      </div>
+    </a>
 
-      <a href="{% url 'map' %}">
-        <div class="box">
-          <strong style="font-size: 25px;">지도 시각화</strong><br><br>
+    <a href="{% url 'map' %}">
+      <div class="box">
+        <strong style="font-size: 25px;">지도 시각화</strong><br>
+        <div style="margin-top: 10px;">
           → 지도 이미지를 통해 내가 살고 있는 지역의 국회의원들을 쉽게 찾을 수 있습니다.
         </div>
-      </a>
+      </div>
+    </a>
 
-      <h3>정보 마당 운영진</h3>
-      <p><strong>김도유</strong> – 시원한 맥주에 바삭한 왕천파닭 한마리</p>
-      <p><strong>차형상</strong> – 같이 게임 개발 하실분 모집합니다!</p>
-      <p><strong>조성욱</strong> – 많은 사람들이 정치에 관심이 많아졌으면 좋겠습니다~</p>
-    </div>
+    <h3>정보 마당 운영진</h3>
+    <p><strong>김도유</strong> – 시원한 맥주에 바삭한 왕천파닭 한마리</p>
+    <p><strong>차형상</strong> – 같이 게임 개발 하실분 모집합니다!</p>
+    <p><strong>조성욱</strong> – 많은 사람들이 정치에 관심이 많아졌으면 좋겠습니다~</p>
+  </div>
   </div>
 
 </body>
+
 </html>

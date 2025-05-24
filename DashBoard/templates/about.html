@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>국회의원 정보 마당</title>
   <style>
@@ -8,12 +10,15 @@
       text-decoration: none;
       color: inherit;
     }
+
     body {
       margin: 0;
-      font-family: '맑은 고딕', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       background-color: #2f2f2f;
       color: white;
+      overflow-y: hidden;
     }
+
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -24,25 +29,30 @@
       gap: 30px;
       font-weight: bold;
     }
+
     .logo {
       color: #00ff66;
       font-size: 40px;
       font-weight: bold;
     }
+
     .menu {
       display: flex;
-      gap: 30px;
-      font-weight: bold;
-      font-size: 20px;
+      gap: 70px;
+      font-size: 25px;
       position: relative;
+      margin-top: 10px;
     }
+
     .menu div {
       color: white;
       cursor: pointer;
     }
+
     .dropdown {
       position: relative;
     }
+
     .dropdown-content {
       display: none;
       position: absolute;
@@ -51,9 +61,10 @@
       background-color: #3a3a3a;
       min-width: 160px;
       border-radius: 5px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       z-index: 1;
     }
+
     .dropdown-content a {
       display: block;
       color: white;
@@ -61,29 +72,36 @@
       text-decoration: none;
       font-size: 18px;
     }
+
     .dropdown-content a:hover {
       background-color: #555;
     }
+
     .dropdown:hover .dropdown-content {
       display: block;
     }
+
     .container {
       padding: 20px 60px 60px 60px;
     }
+
     h1 {
       font-size: 45px;
       margin-top: 0;
       margin-bottom: 20px;
     }
+
     .section {
       margin-bottom: 40px;
       border-top: 1px solid #777;
       padding-top: 30px;
     }
+
     .section h2 {
       font-size: 30px;
       color: white;
     }
+
     .section p {
       margin: 8px 0;
       color: #ddd;
@@ -91,12 +109,15 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="navbar">
     <a href="{% url 'home' %}" class="logo">국회의원 정보 마당</a>
     <div class="menu">
-      <a href="{% url 'about' %}"><div>정보 마당이란</div></a>
+      <a href="{% url 'about' %}">
+        <div>정보 마당이란</div>
+      </a>
       <div class="dropdown">
         <div>정보 마당</div>
         <div class="dropdown-content">
@@ -104,8 +125,12 @@
           <a href="{% url 'rate' %}">비례대표</a>
         </div>
       </div>
-      <a href="{% url 'read' %}"><div>열람 마당</div></a>
-      <a href="{% url 'social' %}"><div>소통 마당</div></a>
+      <a href="{% url 'read' %}">
+        <div>열람 마당</div>
+      </a>
+      <a href="{% url 'social' %}">
+        <div>소통 마당</div>
+      </a>
     </div>
   </div>
 
@@ -132,4 +157,5 @@
   </div>
 
 </body>
+
 </html>
