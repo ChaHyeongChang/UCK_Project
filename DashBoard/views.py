@@ -14,11 +14,11 @@ def rate_view(request):
         members = MemberInfo.objects.filter(
             elected_type='비례대표',
             name__icontains=query
-        ).order_by('name')
+        ).order_by('party', 'name')   # 소속정당 > 이름 순 정렬
     else:
         members = MemberInfo.objects.filter(
             elected_type='비례대표'
-        ).order_by('name')
+        ).order_by('party', 'name')
     paginator = Paginator(members, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -30,11 +30,11 @@ def local_view(request):
         members = MemberInfo.objects.filter(
             elected_type='지역구',
             name__icontains=query
-        ).order_by('name')
+        ).order_by('party', 'name')   # 소속정당 > 이름 순 정렬
     else:
         members = MemberInfo.objects.filter(
             elected_type='지역구'
-        ).order_by('name')
+        ).order_by('party', 'name')
     paginator = Paginator(members, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
